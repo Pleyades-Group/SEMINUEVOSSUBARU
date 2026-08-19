@@ -215,7 +215,7 @@ if (importBtn && fileInput) {
           vin: String(item.VIN || item.vin || '').trim()
         }));
 
-        vehicles = [...newVehicles, ...vehicles];
+        vehicles = newVehicles;
         renderAll();
         fileInput.value = '';
         
