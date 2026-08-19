@@ -158,7 +158,12 @@
                   <option value="">Todas las marcas</option>
                 </select>
               </div>
-              <button id="addVehicleBtn" class="primary-btn">＋ Agregar vehículo</button>
+              <!-- Botón nuevo y input oculto -->
+              <div class="actions-group" style="display: flex; gap: 10px;">
+                <button id="importExcelBtn" class="secondary-btn">⤓ Importar Excel</button>
+                <button id="addVehicleBtn" class="primary-btn">＋ Agregar vehículo</button>
+                <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display: none;" />
+              </div>
             </div>
 
             <div class="table-wrap">
@@ -232,6 +237,7 @@
     </main>
   </div>
 
+  <!-- Dialogs remain same... -->
   <dialog id="vehicleDialog">
     <form id="vehicleForm" method="dialog" class="modal-form">
       <div class="modal-header">
@@ -284,6 +290,8 @@
     </form>
   </dialog>
 
+  <!-- Librería para leer Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>
