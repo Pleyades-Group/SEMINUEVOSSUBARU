@@ -171,58 +171,65 @@ document.querySelector('#cancelVehicle').onclick = ()=>vehicleDialog.close();
 // ==========================================
 // NUEVA FUNCIONALIDAD: IMPORTAR EXCEL
 // ==========================================
-document.querySelector('#importExcelBtn').onclick = () => {
-  document.querySelector('#excelFileInput').click();
-};
+const importBtn = document.querySelector('#importExcelBtn');
+const fileInput = document.querySelector('#excelFileInput');
 
-document.querySelector('#excelFileInput').addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
+if (importBtn && fileInput) {
+  importBtn.addEventListener('click', () => {
+    fileInput.click();
+  });
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      const importedData = XLSX.utils.sheet_to_json(firstSheet);
+  fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-      if (importedData.length === 0) {
-        alert('El archivo Excel está vacío o no tiene el formato correcto.');
-        return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        // Validar que la librería XLSX esté cargada
+        if (typeof XLSX === 'undefined') {
+          alert('Error: La librería SheetJS no se ha cargado correctamente. Revisa tu conexión a internet o la etiqueta script en el HTML.');
+          return;
+        }
+
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const importedData = XLSX.utils.sheet_to_json(firstSheet);
+
+        if (importedData.length === 0) {
+          alert('El archivo Excel está vacío o no tiene el formato correcto.');
+          return;
+        }
+
+        const newVehicles = importedData.map(item => ({
+          id: crypto.randomUUID(),
+          brand: String(item.Marca || item.brand || 'Sin Marca').trim(),
+          model: String(item.Modelo || item.model || 'Sin Modelo').trim(),
+          year: Number(item.Año || item.Anio || item.year || 2025),
+          km: Number(item.Kilometraje || item.KM || item.km || 0),
+          price: Number(item.Precio || item.price || 0),
+          status: String(item.Estado || item.status || 'Disponible').trim(),
+          location: String(item.Ubicación || item.Ubicacion || item.location || 'Piso').trim(),
+          advisor: String(item.Asesor || item.advisor || '').trim(),
+          vin: String(item.VIN || item.vin || '').trim()
+        }));
+
+        vehicles = [...newVehicles, ...vehicles];
+        renderAll();
+        fileInput.value = '';
+        
+        alert(`¡Se han importado ${newVehicles.length} vehículos exitosamente!`);
+      } catch (error) {
+        console.error(error);
+        alert('Hubo un error al procesar el archivo Excel.');
       }
-
-      // Mapear los datos del Excel al formato interno de la aplicación
-      const newVehicles = importedData.map(item => ({
-        id: crypto.randomUUID(),
-        brand: String(item.Marca || item.brand || 'Sin Marca').trim(),
-        model: String(item.Modelo || item.model || 'Sin Modelo').trim(),
-        year: Number(item.Año || item.Anio || item.year || 2025),
-        km: Number(item.Kilometraje || item.KM || item.km || 0),
-        price: Number(item.Precio || item.price || 0),
-        status: String(item.Estado || item.status || 'Disponible').trim(),
-        location: String(item.Ubicación || item.Ubicacion || item.location || 'Piso').trim(),
-        advisor: String(item.Asesor || item.advisor || '').trim(),
-        vin: String(item.VIN || item.vin || '').trim()
-      }));
-
-      // Agregar los vehículos nuevos al inicio del inventario existente
-      vehicles = [...newVehicles, ...vehicles];
-      
-      // Actualizar pantalla y almacenamiento
-      renderAll();
-      
-      // Limpiar el input para permitir re-subir el mismo archivo si es necesario
-      e.target.value = '';
-      
-      alert(`¡Se han importado ${newVehicles.length} vehículos exitosamente!`);
-    } catch (error) {
-      console.error(error);
-      alert('Hubo un error al procesar el archivo Excel. Asegúrate de que sea un archivo válido (.xlsx o .xls).');
-    }
-  };
-  reader.readAsArrayBuffer(file);
-});
+    };
+    reader.readAsArrayBuffer(file);
+  });
+} else {
+  console.error("No se encontró el botón de importar o el input de archivo en el DOM.");
+}
 
 const simpleDialog = document.querySelector('#simpleDialog');
 function openSimple(type){
