@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pleyades | Seminuevos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">✦</div>
+        <div>
+          <strong>PLEYADES</strong>
+          <span>GROUP</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-view="resumen">▦ <span>Resumen</span></button>
+        <button class="nav-item" data-view="inventario">🚘 <span>Inventario</span></button>
+        <button class="nav-item" data-view="avaluos">▣ <span>Avalúos</span></button>
+        <button class="nav-item" data-view="tomas">🤝 <span>Tomas</span></button>
+        <button class="nav-item" data-view="piso">↓ <span>Entradas a Piso</span></button>
+        <button class="nav-item" data-view="ventas">↗ <span>Ventas</span></button>
+        <button class="nav-item" data-view="reacond">🔧 <span>Reacondicionamiento</span></button>
+        <button class="nav-item" data-view="reportes">📄 <span>Reportes</span></button>
+      </nav>
+
+      <div class="sidebar-card">
+        <div class="subaru-badge">SUBARU</div>
+        <strong>SEMINUEVOS</strong>
+        <p>Control integral de inventario, ventas y avalúos.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1>SEMINUEVOS</h1>
+          <p id="viewSubtitle">Dashboard general del departamento</p>
+        </div>
+        <div class="profile">
+          <div class="profile-text">
+            <strong>David Ortiz</strong>
+            <span>Gerente de Seminuevos</span>
+          </div>
+          <div class="avatar">DO</div>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="heading-row">
+          <div>
+            <h2 id="viewTitle">Dashboard General</h2>
+            <p id="viewDescription">Visión completa del inventario y rendimiento.</p>
+          </div>
+          <div class="branch-select">
+            <label>Sucursal</label>
+            <select id="branchFilter">
+              <option>Subaru Veracruz</option>
+              <option>Puebla</option>
+              <option>Grupo Pleyades</option>
+            </select>
+          </div>
+        </div>
+
+        <section id="resumenView" class="view active-view">
+          <div class="kpi-grid">
+            <article class="kpi blue">
+              <span>Inventario Total</span>
+              <strong id="kpiTotal">0</strong>
+              <small>unidades registradas</small>
+            </article>
+            <article class="kpi green">
+              <span>Disponibles</span>
+              <strong id="kpiAvailable">0</strong>
+              <small>listas para venta</small>
+            </article>
+            <article class="kpi amber">
+              <span>En Proceso</span>
+              <strong id="kpiProcess">0</strong>
+              <small>reacondicionamiento / documentación</small>
+            </article>
+            <article class="kpi red">
+              <span>Vendidas</span>
+              <strong id="kpiSold">0</strong>
+              <small>histórico cargado</small>
+            </article>
+            <article class="kpi purple">
+              <span>Valor Inventario</span>
+              <strong id="kpiValue">$0</strong>
+              <small>MXN</small>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel chart-panel">
+              <div class="panel-title">
+                <h3>Inventario por Marca</h3>
+              </div>
+              <canvas id="brandChart"></canvas>
+            </article>
+            <article class="panel chart-panel">
+              <div class="panel-title">
+                <h3>Unidades por Año</h3>
+              </div>
+              <canvas id="yearChart"></canvas>
+            </article>
+            <article class="panel quick-actions">
+              <div class="panel-title"><h3>Acciones rápidas</h3></div>
+              <button id="quickAddVehicle">＋ Nueva Entrada</button>
+              <button id="quickAddAppraisal" class="secondary-green">＋ Nuevo Avalúo</button>
+              <button id="quickAddTake" class="secondary-amber">＋ Nueva Toma</button>
+            </article>
+          </div>
+
+          <article class="panel">
+            <div class="panel-title split">
+              <h3>Inventario Reciente</h3>
+              <button class="link-btn" id="goInventory">Ver todo →</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Marca / Modelo</th>
+                    <th>Año</th>
+                    <th>KM</th>
+                    <th>Precio</th>
+                    <th>Estado</th>
+                    <th>Ubicación</th>
+                  </tr>
+                </thead>
+                <tbody id="recentInventoryBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section id="inventarioView" class="view">
+          <article class="panel">
+            <div class="toolbar">
+              <div class="filters">
+                <input id="searchInput" type="search" placeholder="Buscar marca, modelo, VIN..." />
+                <select id="statusFilter">
+                  <option value="">Todos los estados</option>
+                  <option>Disponible</option>
+                  <option>En Proceso</option>
+                  <option>Vendido</option>
+                </select>
+                <select id="brandFilter">
+                  <option value="">Todas las marcas</option>
+                </select>
+              </div>
+              <button id="addVehicleBtn" class="primary-btn">＋ Agregar vehículo</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Marca / Modelo</th>
+                    <th>Año</th>
+                    <th>KM</th>
+                    <th>Precio</th>
+                    <th>Estado</th>
+                    <th>Ubicación</th>
+                    <th>Asesor</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section id="avaluosView" class="view">
+          <article class="panel">
+            <div class="panel-title split">
+              <div>
+                <h3>Avalúos</h3>
+                <p>Control de unidades por valorar o ya valuadas.</p>
+              </div>
+              <button class="primary-btn" id="addAppraisalBtn">＋ Nuevo avalúo</button>
+            </div>
+            <div id="appraisalCards" class="cards-list"></div>
+          </article>
+        </section>
+
+        <section id="tomasView" class="view">
+          <article class="panel">
+            <div class="panel-title split">
+              <div>
+                <h3>Tomas</h3>
+                <p>Seguimiento de unidades tomadas a cuenta.</p>
+              </div>
+              <button class="primary-btn" id="addTakeBtn">＋ Nueva toma</button>
+            </div>
+            <div id="takesList" class="cards-list"></div>
+          </article>
+        </section>
+
+        <section id="pisoView" class="view">
+          <article class="panel"><div class="panel-title"><h3>Entradas a Piso</h3></div><div id="floorList" class="cards-list"></div></article>
+        </section>
+
+        <section id="ventasView" class="view">
+          <article class="panel"><div class="panel-title"><h3>Ventas</h3></div><div id="salesList" class="cards-list"></div></article>
+        </section>
+
+        <section id="reacondView" class="view">
+          <article class="panel"><div class="panel-title"><h3>Reacondicionamiento</h3></div><div id="reconditioningList" class="cards-list"></div></article>
+        </section>
+
+        <section id="reportesView" class="view">
+          <article class="panel report-card">
+            <div>
+              <h3>Reporte de Inventario</h3>
+              <p>Exporta el inventario actual a CSV para abrirlo en Excel.</p>
+            </div>
+            <button id="exportCsvBtn" class="primary-btn">Descargar CSV</button>
+          </article>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="vehicleDialog">
+    <form id="vehicleForm" method="dialog" class="modal-form">
+      <div class="modal-header">
+        <h3 id="vehicleModalTitle">Agregar vehículo</h3>
+        <button type="button" class="icon-btn" id="closeVehicleDialog">✕</button>
+      </div>
+      <input type="hidden" id="vehicleId" />
+      <div class="form-grid">
+        <label>Marca<input id="vehicleBrand" required /></label>
+        <label>Modelo<input id="vehicleModel" required /></label>
+        <label>Año<input id="vehicleYear" type="number" min="1990" max="2030" required /></label>
+        <label>Kilometraje<input id="vehicleKm" type="number" min="0" required /></label>
+        <label>Precio<input id="vehiclePrice" type="number" min="0" required /></label>
+        <label>Estado
+          <select id="vehicleStatus">
+            <option>Disponible</option>
+            <option>En Proceso</option>
+            <option>Vendido</option>
+          </select>
+        </label>
+        <label>Ubicación<input id="vehicleLocation" value="Piso" /></label>
+        <label>Asesor<input id="vehicleAdvisor" placeholder="Ej. Jared / Ángel" /></label>
+        <label class="full">VIN / Serie<input id="vehicleVin" /></label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" id="cancelVehicle">Cancelar</button>
+        <button type="submit" class="primary-btn">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="simpleDialog">
+    <form id="simpleForm" method="dialog" class="modal-form">
+      <div class="modal-header">
+        <h3 id="simpleModalTitle">Nuevo registro</h3>
+        <button type="button" class="icon-btn" id="closeSimpleDialog">✕</button>
+      </div>
+      <input type="hidden" id="simpleType" />
+      <div class="form-grid">
+        <label>Cliente<input id="simpleClient" required /></label>
+        <label>Vehículo<input id="simpleVehicle" required /></label>
+        <label>Fecha<input id="simpleDate" type="date" required /></label>
+        <label>Estatus<input id="simpleStatus" value="Pendiente" /></label>
+        <label class="full">Notas<textarea id="simpleNotes" rows="3"></textarea></label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" id="cancelSimple">Cancelar</button>
+        <button type="submit" class="primary-btn">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="./app.js"></script>
+</body>
+</html>
