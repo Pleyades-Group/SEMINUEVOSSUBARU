@@ -215,7 +215,13 @@ if (importBtn && fileInput) {
           vin: String(item.VIN || item.vin || '').trim()
         }));
 
-        vehicles = newVehicles;
+        // Reemplazamos la variable global
+          vehicles = newVehicles;
+
+          // Forzamos la limpieza y guardado inmediato en el localStorage
+          localStorage.setItem(storeKeys.vehicles, JSON.stringify(vehicles));
+
+          // Actualizamos toda la interfaz
         renderAll();
         fileInput.value = '';
         
